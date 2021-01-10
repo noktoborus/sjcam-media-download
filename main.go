@@ -271,7 +271,8 @@ func runControl(outboundIP string, dataAddress string,
 
     err := decoder.Decode(&message)
     if err != nil {
-      panic(err)
+      fmt.Printf("Communication with device failed: %s\n", err)
+      return
     }
 
     api.DoResponse(&state, message)
@@ -294,13 +295,13 @@ func main() {
 
   conn, err := net.Dial("tcp", address)
   if err != nil {
-    panic(fmt.Sprintf("Cannot connect to %s: %s\n", address, err))
+    fmt.Printf("Cannot connect to %s: %s\n", address, err)
+    return
   }
+  defer conn.Close()
 
   decoder := json.NewDecoder(conn)
   encoder := json.NewEncoder(conn)
 
   runControl(localAddress, dataAddress, encoder, decoder)
-
-  conn.Close()
 }
