@@ -7,6 +7,11 @@ Program can:
 * print camera info
 * print battery status between downloads
 
+# use
+Before run this probram you must connect to camera's WiFi.
+You are screwed if camera use address not from 192.168.42.0/24 network or
+camera address not is 192.168.42.1.
+
 # continue-download
 I do not known why origin SJCAM app (SJCAM Zone) in get file message use field 'Offset_value':
 
