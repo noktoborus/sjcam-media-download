@@ -80,6 +80,7 @@ func receiveFile(dataAddress string, task ReceiverTask) {
 
 type FileSaveInfo struct {
   FileName string
+  Offset uint64
   Size uint64
 }
 
@@ -116,7 +117,7 @@ func setupCallback(outboundIP string, dataAddress string,
 
     remoteFilePath = getRemotePath(mediaFolder, reamingFiles[0].FileName)
     fmt.Printf("Download file: %s\n", remoteFilePath)
-    encoder.Encode((&api.GetFileRequest{}).New(token, 0, remoteFilePath))
+    encoder.Encode((&api.GetFileRequest{}).New(token, reamingFiles[0].Offset, remoteFilePath))
   }
 
   state.DoError = func(response api.Response) {
@@ -162,6 +163,7 @@ func setupCallback(outboundIP string, dataAddress string,
     for index, media := range mediaList.Media {
       var info = strings.Split(media, ",")
       var localFile = getLocalPath(info[0])
+      var offset uint64 = 0
       size, _ := strconv.ParseUint(info[len(info)-1], 10, 64)
 
       fmt.Printf("%03d. %s\n", index + 1, media)
@@ -173,8 +175,8 @@ func setupCallback(outboundIP string, dataAddress string,
         } else if ( info.Size() > int64(size) ) { 
           fmt.Printf("   - skip: local size %d > remote %d\n", info.Size(), size)
         } else if( info.Size() < int64(size) ) {
-          size = size - uint64(info.Size())
-          fmt.Printf("   - queued %d bytes for download\n", size)
+          offset = uint64(info.Size())
+          fmt.Printf("   - queued %d/%d bytes for download\n", size - offset, size)
         } else {
           fmt.Printf("   - queued for download\n")
         }
@@ -182,7 +184,7 @@ func setupCallback(outboundIP string, dataAddress string,
         fmt.Printf("   - queued for download\n")
       }
       /* append file to download queue */
-      reamingFiles = append(reamingFiles, FileSaveInfo{info[0], size})
+      reamingFiles = append(reamingFiles, FileSaveInfo{info[0], offset, size})
     }
     fmt.Printf("[Index %d Total %d]\n", mediaList.Index, mediaList.Total)
     /* SJCAM API do not allow send command chunks e.g. ({msg_id:1}{msg_id:2})
@@ -211,7 +213,7 @@ func setupCallback(outboundIP string, dataAddress string,
     var localFileName = getLocalPath(reamingFiles[0].FileName)
 
     size, _ := strconv.ParseUint(getFile.Size, 10, 64)
-    offset := getFile.RemainSize - uint64(size)
+    offset := uint64(size) - getFile.RemainSize
     receiveFile(dataAddress,
                 ReceiverTask{localFileName, offset, uint64(size)})
     fmt.Printf("Remove %q from download queue\n", reamingFiles[0].FileName)

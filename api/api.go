@@ -120,7 +120,7 @@ type GetFileRequest struct {
   MsgType MessageType `json:"msg_id"`
   Token TokenType `json:"token"`
 
-  Offset uint64 `json:"Offset_value"`
+  Offset uint64 `json:"offset"`
   Path string `json:"param"`
 }
 
