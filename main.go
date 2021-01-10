@@ -178,6 +178,8 @@ func setupCallback(outboundIP string, dataAddress string,
         } else {
           fmt.Printf("   - queued for download\n")
         }
+      } else {
+        fmt.Printf("   - queued for download\n")
       }
       /* append file to download queue */
       reamingFiles = append(reamingFiles, FileSaveInfo{info[0], size})
