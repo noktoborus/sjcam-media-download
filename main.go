@@ -279,19 +279,13 @@ func runControl(outboundIP string, dataAddress string,
   }
 }
 
-func getOutboundIP(cameraIP string) string {
-  conn, _ := net.Dial("ip:icmp", cameraIP)
-  return fmt.Sprintf("%s", conn.LocalAddr())
-}
-
 func main() {
   var address = fmt.Sprintf("%s:%d", cameraIP, cameraPort)
   var dataAddress = fmt.Sprintf("%s:%d", cameraIP, receivePort)
-  var localAddress = getOutboundIP(cameraIP)
+  var localAddress string
 
   fmt.Printf("Hello.\n")
   fmt.Printf("Now I connect to %s and try to receive all media from %s.\n", address, dataAddress)
-  fmt.Printf("And use %s as source address\n", localAddress);
 
   conn, err := net.Dial("tcp", address)
   if err != nil {
@@ -299,6 +293,9 @@ func main() {
     return
   }
   defer conn.Close()
+  localAddress = fmt.Sprintf("%s", conn.LocalAddr())
+
+  fmt.Printf("Address %s used as source for download\n", localAddress);
 
   decoder := json.NewDecoder(conn)
   encoder := json.NewEncoder(conn)
