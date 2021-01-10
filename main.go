@@ -1,6 +1,7 @@
 package main
 
 import (
+  "time"
   "os"
   "strconv"
   "strings"
@@ -60,6 +61,8 @@ func receiveFile(dataAddress string, task ReceiverTask) {
   expectedBytes = task.size - task.offset
   fmt.Printf("Download task for file: %q (full size: %d, reaming: %d)\n",
              task.filename, task.size, expectedBytes)
+  timeStart := time.Now()
+  speed := 0.0
   for {
     bytes, err := conn.Read(buf)
     if err != nil {
@@ -75,7 +78,19 @@ func receiveFile(dataAddress string, task ReceiverTask) {
       fmt.Printf("Download complete: %d trail bytes\n", receivedBytes - expectedBytes)
       break
     }
+
+    timeElapsed := time.Since(timeStart)
+    currentSpeed := float64(receivedBytes) / 1024 / 1024 / timeElapsed.Seconds()
+    if currentSpeed > speed + 0.5 || currentSpeed < speed -1 {
+      speed = currentSpeed
+      fmt.Printf("current download speed is %.2fMB/s\n", speed)
+    }
   }
+  timeElapsed := time.Since(timeStart)
+  fmt.Printf("Download speed: %.2fMB/s (%.2fMB in %s)\n",
+             float64(receivedBytes) / 1024 / 1024 / timeElapsed.Seconds(),
+             float64(receivedBytes) / 1024 / 1024,
+             timeElapsed)
 }
 
 type FileSaveInfo struct {
