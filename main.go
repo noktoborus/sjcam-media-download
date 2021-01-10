@@ -141,6 +141,12 @@ func setupCallback(outboundIP string, dataAddress string,
       return
     }
 
+    if response.MsgType == api.Token && response.RVal == api.CameraNotReady {
+      fmt.Printf("Camera do not allow run commands: may be you view pictures on device's screen")
+      endLoop()
+      return
+    }
+
     if response.MsgType == api.MediaList && response.RVal == api.InvalidArguments {
       fmt.Printf("Nothing to save: media storage is empty\n")
       endLoop()

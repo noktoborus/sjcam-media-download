@@ -17,6 +17,7 @@ const (
   Success RVal = 0
   InvalidArguments = -1
   InvalidToken = -4
+  CameraNotReady = -14
   FileNotFound = -25
 )
 
