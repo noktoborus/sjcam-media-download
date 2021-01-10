@@ -1,6 +1,6 @@
 .vscode
 # Directories
-db/
+media/
 
 # Binaries for programs and plugins
 wsang-server
